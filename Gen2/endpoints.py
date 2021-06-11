@@ -8,7 +8,9 @@ from ecweather import weather_cache, WeatherException
 from phue import Bridge, PhueRequestTimeout
 from twilio.rest import TwilioRestClient
 from scheduler import tm
-import urllib, datetime, shelve, xbmclib
+import urllib, datetime, shelve, xbmclib, os.path
+
+# Comment to test beacons are working again.
 
 LOCATIONS = {
     '192.168.xxx.xxx':'Old computer',
@@ -73,6 +75,7 @@ def set_hue():
     h = request.query.get('hue',None)
     if h is None:
         return '?'
+    h = int(h)
     for l in hue.lights:
         if l.on:
             l.hue = h
@@ -83,6 +86,7 @@ def set_brightness():
     b = request.query.get('value',None)
     if b is None:
         return '?'
+    b = int(b)
     for l in hue.lights:
         if l.on:
             l.brightness = int(b*255/100.0)
@@ -96,6 +100,7 @@ def coming_home():
     if inside:
         pub.hud(2, 'ON')
         spawn_later(60, say_reminders, home_reminders)
+        tm.evening_schedule()
         #t = ReminderThread(home_reminders)
         #t.start()
     else:
@@ -137,6 +142,11 @@ def save_theme():
 
 @get('/allbright')
 def all_bright():
+    inc = request.query.get('inc',None)
+    if inc == 'Jay':
+        lgt = 'xxx'
+    else:
+        lgt = 'Jason'
     cron.pause = True
     pub.hud(1, 'ON')
     pub.hud(2, 'ON')
@@ -144,19 +154,30 @@ def all_bright():
     pub.hud(2, 'BRIGHT')
     pub.say('Setting maximum light brightness Kevin.')
     for l in hue.lights:
-        set_light(l, True, 34494, 254, 232)
+        if l.name != lgt:
+            set_light(l, True, 34494, 254, 232)
+    return 'OK'
+
+@get('/jason')
+def jason_light():
+    lights = hue.get_light_objects('name')
+    set_light(lights['Jason'], True, 34494, 254, 232)
     return 'OK'
 
 @get('/bath_alert')
 def bath_alert():
     who = request.query.get('who',None)
-    cron.visiting = who
+    if who != 'Set':
+        cron.visiting = who
     lights = hue.get_light_objects('name')
     set_light(lights['Candle'], True, 14910, 254)
     set_light(lights['Study'], True, 34494, 232)
     if who and cron.is_home:
         #cron.pause = True
-        pub.say('Kevin, %s has just been let in the front door downstairs.' % who)
+        if who == 'Set':
+            pub.say('Kevin, %s is currently buzzing up.' % cron.visiting)
+        else:
+            pub.say('Kevin, %s has just been let in the front door downstairs.' % who)
         send_event('disarm_security','bath_alert')
     return 'OK'
 
@@ -202,6 +223,9 @@ def bedroom():
     if lights['Bedroom'].on:
         pub.hud(1, 'OFF')
         pub.hud(2, 'ON')
+        if cron.allow_rooms:
+            lights['Bedroom'].on = False
+            return 'OK'
         if cron.is_dark:
             lgts = ('Living room', 'LightStrips',)
         else:
@@ -213,6 +237,7 @@ def bedroom():
             pub.say('Are you ready to go to bed now Kevin?')
         pub.hud(2, 'OFF')
         pub.hud(1, 'ON')
+        open('/run/saltctl','w').write('fw|ipset')
         lgts = ('Bedroom', 'LightStrips',)
     else:
         pub.hud(2, 'OFF')
@@ -225,7 +250,8 @@ def bedroom():
         if l.name in lgts:
             set_light(l, True, h, b, s)
         elif l.on:
-            set_light(l, False)
+            if not cron.allow_rooms:
+                set_light(l, False)
     return 'OK'
 
 def ivr_shower(enable):
@@ -273,6 +299,9 @@ def study():
     if lights['Study'].on:
         pub.hud(2, 'ON')
         pub.say('I have turned off the study light Kevin.')
+        if cron.allow_rooms:
+            lights['Study'].on = False
+            return 'OK'
         if cron.is_dark:
             lgts = ('Brazier', 'Living room', 'LightStrips')
         else:
@@ -286,7 +315,8 @@ def study():
         if l.name in lgts:
             set_light(l, True, 34494, 254, 232)
         elif l.on:
-            set_light(l, False)
+            if not cron.allow_rooms:
+                set_light(l, False)
     return 'OK'
 
 @get('/entrance')
@@ -313,8 +343,8 @@ def enterance():
                 pub.say('Good bye %s.' % cron.visiting)
             else:
                 pub.say('Are you going somewhere Kevin?')
+        set_light(lights['Study'], True, 34494, 254, 232)
         if cron.is_dark:
-            set_light(lights['Study'], True, 34494, 254, 232)
             set_light(lights['Brazier'], True, 34494, 128, 232)
         send_event('disarm_security','entrance')
         cron.visiting = None
@@ -370,8 +400,9 @@ def kitchen_hud():
 def all_bright():
     #commander.hud_video()
     #commander.addCommand('play /home/kveroneau/karen.mp3')
-    pub.say('Intruder alert! Turning on lights!')
+    pub.say('Intruder alert!')
     if cron.is_dark:
+        pub.say('Turning on lights!')
         for l in hue.lights:
             set_light(l, True, 34494, 254, 232)
         cron.pause = True
@@ -497,10 +528,10 @@ def wake_reminder():
 def timed_reminder(text):
     pub.say(text)
 
-@get('/set_timer')
+@post('/set_timer')
 def set_timer():
-    length = int(request.query.get('minutes', 5))
-    text = request.query.get('text','Timer triggered!')
+    length = int(request.forms.get('minutes', 5))
+    text = request.forms.get('text','Timer triggered!')
     spawn_later(60*length, timed_reminder, text)
     pub.say('I will remind you in %s minutes %s.' % (length, text))
     return 'OK'
@@ -525,8 +556,9 @@ def login_notify():
     if cron.is_home:
         pub.say(message)
     else:
-        c = TwilioRestClient(SID, TOKEN)
-        c.messages.create(to='+1587######', from_='+1587#######', body=message)
+        #c = TwilioRestClient(SID, TOKEN)
+        #c.messages.create(to='+1587#######', from_='+1587#######', body=message)
+        send_event('login_notify', message)
     return 'OK'
 
 @get('/config')
@@ -535,7 +567,8 @@ def automation_config():
 
 @get('/health')
 def health_monitor():
-    config = {'sleeping':cron.is_sleeping, 'home':cron.is_home, 'dark':cron.is_dark, 'paused':cron.pause, 'rooms':cron.allow_rooms}
+    config = {'sleeping':cron.is_sleeping, 'home':cron.is_home, 'dark':cron.is_dark, 'paused':cron.pause, 'rooms':cron.allow_rooms,
+    'wakeme':cron.wakeme}
     available = {}
     services = list(cron.HEARTBEAT_URLS.keys())
     services.extend(cron.HEARTBEAT_TCP.keys())
@@ -627,6 +660,27 @@ def tm_schedule():
         elif itm.has_key('notify'):
             data+='%s<br/>' % itm['notify']
     return data
+
+@get('/tm.csv')
+def tm_json():
+    fname = request.get_header('X-Filename')
+    if fname is None:
+        return 'ERR'
+    if not os.path.exists('schedule/%s.dat' % fname):
+        return 'FNF'
+    return open('schedule/%s.dat' % fname).read()
+
+@post('/tm.csv')
+def tm_post():
+    fname = request.get_header('X-Filename')
+    if fname is None:
+        return 'ERR'
+    try:
+        data = request.body.read()
+        open('schedule/%s.dat' % fname, 'w').write(data[:-1])
+        return 'SAVED'
+    except:
+        return 'ERR'
 
 @get('/toggle_oncall')
 def toggle_oncall():

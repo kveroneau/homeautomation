@@ -59,6 +59,8 @@ class TimeManager(Greenlet):
             self.__schedule.append({'dt':dt,'triggered':tgr,'notify':'Begin project work for %s.' % param})
         elif action == 3:
             self.__schedule.append({'dt':dt,'triggered':tgr,'notify':'Time to relax and %s' % param})
+        elif action == 98:
+            self.__schedule.append({'dt':dt,'triggered':tgr,'endpoint':param})
         elif action == 99:
             self.__schedule.append({'dt':dt,'triggered':tgr,'special':param})
     def __morning_routine(self, leisure):
@@ -74,7 +76,7 @@ class TimeManager(Greenlet):
                 self.__schedule.append({'dt':dt,'triggered':tgr,'notify':itm[2]})
             elif itm[1] == 3:
                 self.__schedule.append({'dt':dt,'triggered':tgr,'notify':'play some %s while you wake up.' % leisure})
-    def __generate_schedule(self):
+    def __get_tables(self):
         projects, leisure = [],[]
         f = open('tables','rb')
         for i in range(0,ord(f.read(1))):
@@ -82,6 +84,9 @@ class TimeManager(Greenlet):
         for i in range(0,ord(f.read(1))):
             leisure.append((f.read(ord(f.read(1))), ord(f.read(1))))
         f.close()
+        return self.__random_list(projects), self.__random_list(leisure)
+    def __generate_schedule(self):
+        rprojects, rleisure = self.__get_tables()
         rprojects = self.__random_list(projects)
         rleisure = self.__random_list(leisure)
         now = datetime.datetime.now()
@@ -167,6 +172,7 @@ class TimeManager(Greenlet):
                 idx = 3
                 self.__schedule.append({'dt':dt,'triggered':tgr,'notify':'Begin project work for %s.' % rprojects.pop()})
     def __update_schedule(self):
+        self.__custom = False
         now = datetime.datetime.now()
         dt = datetime.datetime(now.year,now.month,now.day,2,0)
         self.__schedule = [{'dt':dt+datetime.timedelta(days=1), 'triggered':False,'special':'update_schedule'}]
@@ -191,8 +197,11 @@ class TimeManager(Greenlet):
                 self.__schedule.append({'dt':dt,'triggered':tgr,'notify':'Begin project work for %s' % sch[2]})
             elif sch[1] == '3':
                 self.__schedule.append({'dt':dt,'triggered':tgr,'notify':'Time to relax and %s' % sch[2]})
+            elif sch[1] == '98':
+                self.__schedule.append({'dt':dt,'triggered':tgr,'endpoint':sch[2]})
             elif sch[1] == '99':
                 self.__schedule.append({'dt':dt,'triggered':tgr,'special':sch[2]})
+        self.__custom = True
     def get_schedule(self):
         return list(self.__schedule)
     def reload_schedule(self):
@@ -201,6 +210,18 @@ class TimeManager(Greenlet):
         except:
             pub.say('An exception occurred while attempting to update your schedule.')
             self.__generate_schedule()
+    def evening_schedule(self):
+        if self.__custom:
+            return
+        self.__custom = True # Just to ensure we do not add duplicates to the schedule.
+        now = datetime.datetime.now()+datetime.timedelta(minutes=5)
+        wd = now.isoweekday()
+        if wd in (6,7,):
+            return
+        rprojects, rleisure = self.__get_tables()
+        if now.hour < 19:
+            self.append('%s:%s' % (now.hour,now.minute), 2, rprojects.pop())
+            self.append('%s:%s' % (now.hour+1,now.minute), 3, 'play some %s' % rleisure.pop())
     def _run(self):
         try:
             #self.__generate_schedule()
@@ -231,6 +252,15 @@ class TimeManager(Greenlet):
                                 elif itm['special'] == 'toggle_wakeme':
                                     itm['triggered'] = True
                                     urllib.urlopen('http://localhost:8080/toggle_wakeme')
+                                elif itm['special'] == 'lockdown':
+                                    itm['triggered'] = True
+                                    if cron.is_home:
+                                        urllib.urlopen('http://localhost:8080/fw?ip=lockdown')
+                                        notify('Network has been locked down')
+                                elif itm['special'] == 'ipset':
+                                    itm['triggered'] = True
+                                    urllib.urlopen('http://localhost:8080/fw?ip=ipset')
+                                    notify('Network has been unlocked')
                                 elif itm['special'] == 'toggle_pause':
                                     itm['triggered'] = True
                                     urllib.urlopen('http://localhost:8080/toggle_pause')
@@ -240,6 +270,10 @@ class TimeManager(Greenlet):
                                 elif itm['special'] == 'entrance':
                                     itm['triggered'] = True
                                     urllib.urlopen('http://localhost:8080/entrance')
+                                elif itm['special'] == 'study':
+                                    itm['triggered'] = True
+                                    if cron.is_home:
+                                        urllib.urlopen('http://localhost:8080/study')
                                 elif itm['special'] == 'weather_check':
                                     itm['triggered'] = True
                                     temp = temperature()
@@ -280,6 +314,9 @@ class TimeManager(Greenlet):
                             elif itm.has_key('notify'):
                                 notify(itm['notify'])
                                 itm['triggered'] = True
+                            elif itm.has_key('endpoint'):
+                                itm['triggered'] = True
+                                urllib.urlopen('http://localhost:8080/%s' % itm['endpoint'])
             if sch_upd:
                 sch_upd = False
                 try:

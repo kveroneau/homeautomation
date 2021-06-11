@@ -32,8 +32,24 @@ class Scheduler(Greenlet):
         'node1': ('node1.veroneau.net',22),
         'cloud1': ('cloud01.veroneau.net',22),
         "Hacker's Edge server": ('hackers-edge.com',1337),
-        'cody': ('sonytv', 9090),
         'video database': ('127.0.0.1',7070),
+    }
+    HEARTBEAT_NMAP = {
+        'Playstation 4': 'ps4',
+        'Playstation 3': 'ps3',
+        'Wii U': 'wiiu',
+        "Kevin's Phone": 'priv',
+        'Samsung Tablet': 's5e',
+        'Security Camera': 'piper',
+        'Google Home Device': 'google',
+        'Kobo Reader': 'kobo',
+        'Sony TV': 'sonytv',
+        'Oculus Go': 'oculus',
+        'Oculus Quest': 'quest',
+        'Lenovo Tablet': 'lenovo7',
+        'Thinkpad': 'thinkpad',
+        'Macbook': 'macbook',
+        'Android Reader': 'nova',
     }
     def __init__(self):
         Greenlet.__init__(self)
@@ -59,6 +75,9 @@ class Scheduler(Greenlet):
             self.__available.append(name)
         for name in self.HEARTBEAT_TCP.keys():
             self.__available.append(name)
+        #for name in self.HEARTBEAT_NMAP.keys():
+        #    self.__available.append(name)
+        #self.__available.append('aarron')
     @property
     def pause(self):
         return self.__pause
@@ -97,11 +116,11 @@ class Scheduler(Greenlet):
             return
         try:
             if self.is_dark and not self.__darkmode:
+                pub.hud_log('Setting dark mode.')
                 if not self.is_sleeping:
-                    pub.hud_log('Setting dark mode.')
                     pub.say('It is after sunset Kevin, setting dark mode.')
                     urllib.urlopen('http://localhost:8080/strips')
-                    self.__darkmode = True
+                self.__darkmode = True
             elif self.__darkmode and not self.is_dark:
                 if not self.is_sleeping:
                     pub.say('It is now sunrise Kevin, turning off lights.')
@@ -119,7 +138,7 @@ class Scheduler(Greenlet):
             if now in self.__reminders.keys():
                 pub.say(self.__reminders[now])
                 del self.__reminders[now]
-            RELAX_HR, WAKEUP_HR, WORK_HR = 21,7,8
+            RELAX_HR, WAKEUP_HR, WORK_HR = 21,8,9
             #if wd == 3:
             #    WAKEUP_HR, WORK_HR = 7,8
             if wd == 7 or wd == 6:
@@ -232,12 +251,39 @@ class Scheduler(Greenlet):
                     send_event('phone_notify','Unable to contact %s.' % name)
                 pub.hud_log('Unable to contact %s.' % name)
                 self.__available.remove(name)
+    def __check_nmap(self):
+        try:
+            nmap = urllib.urlopen('http://srv01/bandwidthd/nmap.xml').read()
+            for name, addr in self.HEARTBEAT_NMAP.items():
+                if addr in nmap:
+                    if name not in self.__available:
+                        self.__available.append(name)
+                        pub.say('Kevin, %s is now online.' % name)
+                        pub.hud_log('%s is now online.' % name)
+                else:
+                    if name in self.__available:
+                        if self.is_home:
+                            pub.say('Kevin, I am currently unable to contact %s.' % name)
+                        pub.hud_log('Unable to contact %s.' % name)
+                        self.__available.remove(name)
+            if 'aarron' in nmap:
+                if 'aarron' not in self.__available:
+                    self.__available.append('aarron')
+                    pub.say('Hello Aarron!  Welcome home!')
+            else:
+                if 'aarron' in self.__available:
+                    self.__available.remove('aarron')
+                    pub.say('Kevin, Aarron has disconnected from the network.')                    
+        except:
+            pub.say('Kevin, there was an error in the network mapping thread.')
+            pub.hud_log('nmap thread error.')
     def __heartbeat(self):
         chklst = []
         for name, url in self.HEARTBEAT_URLS.items():
             chklst.append(spawn(self.__test_http, name, url))
         for name, addr in self.HEARTBEAT_TCP.items():
             chklst.append(spawn(self.__test_tcp, name, addr))
+        #chklst.append(spawn(self.__check_nmap))
         joinall(chklst)
     @property
     def is_home(self):
@@ -310,13 +356,12 @@ class Scheduler(Greenlet):
                     send_event('arm_away','backdoor')
     def _run(self):
         self.__hue = Bridge('hue')
-        self.__get_config()
         while True:
-            sleep(60)
             self.__get_config()
             self.__update_sun()
             hb = spawn(self.__heartbeat)
             schd = spawn(self.__schedule)
+            sleep(60)
             try:
                 if not self.pause:
                     self.real_run()
