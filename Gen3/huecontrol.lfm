@@ -1,0 +1,120 @@
+object LightControlForm: TLightControlForm
+  Left = 313
+  Height = 235
+  Top = 187
+  Width = 313
+  Caption = 'Light Controller Test App'
+  ClientHeight = 235
+  ClientWidth = 313
+  DesignTimePPI = 94
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  LCLVersion = '2.0.12.0'
+  object LightList: TListBox
+    Left = 0
+    Height = 232
+    Top = 0
+    Width = 162
+    ItemHeight = 0
+    OnClick = LightListClick
+    ScrollWidth = 160
+    TabOrder = 0
+    TopIndex = -1
+  end
+  object LightOn: TCheckBox
+    Left = 168
+    Height = 21
+    Top = 8
+    Width = 76
+    Caption = 'Light On'
+    TabOrder = 1
+  end
+  object Label1: TLabel
+    Left = 168
+    Height = 18
+    Top = 40
+    Width = 75
+    Caption = 'Brightness:'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Label2: TLabel
+    Left = 168
+    Height = 18
+    Top = 72
+    Width = 31
+    Caption = 'Hue:'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Label3: TLabel
+    Left = 168
+    Height = 18
+    Top = 104
+    Width = 75
+    Caption = 'Saturation:'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Brightness: TEdit
+    Left = 248
+    Height = 30
+    Top = 32
+    Width = 64
+    NumbersOnly = True
+    TabOrder = 2
+  end
+  object Hue: TEdit
+    Left = 248
+    Height = 30
+    Top = 64
+    Width = 64
+    NumbersOnly = True
+    TabOrder = 3
+  end
+  object Saturation: TEdit
+    Left = 248
+    Height = 30
+    Top = 96
+    Width = 63
+    NumbersOnly = True
+    TabOrder = 4
+  end
+  object ApplyBtn: TButton
+    Left = 168
+    Height = 24
+    Top = 136
+    Width = 73
+    Caption = 'Apply'
+    OnClick = ApplyBtnClick
+    TabOrder = 5
+  end
+  object StopBtn: TButton
+    Left = 168
+    Height = 24
+    Top = 168
+    Width = 73
+    Caption = 'Stop'
+    OnClick = StopBtnClick
+    TabOrder = 6
+  end
+  object LightMode: TComboBox
+    Left = 168
+    Height = 30
+    Top = 200
+    Width = 143
+    ItemHeight = 0
+    ItemIndex = 0
+    Items.Strings = (
+      'Adapt'
+      'Enforce'
+    )
+    OnChange = LightModeChange
+    Style = csDropDownList
+    TabOrder = 7
+    Text = 'Adapt'
+  end
+end

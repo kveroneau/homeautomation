@@ -1,0 +1,79 @@
+object CUEndpoints: TCUEndpoints
+  OnCreate = DataModuleCreate
+  OnDestroy = DataModuleDestroy
+  OldCreateOrder = False
+  Actions = <  
+    item
+      Name = 'CUShutdown'
+      Default = False
+      OnRequest = CUShutdownRequest
+      Template.AllowTagParams = False
+    end  
+    item
+      Name = 'config'
+      Default = False
+      OnRequest = configRequest
+      Template.AllowTagParams = False
+    end  
+    item
+      Name = 'health'
+      Default = False
+      OnRequest = healthRequest
+      Template.AllowTagParams = False
+    end  
+    item
+      Name = 'study'
+      Default = False
+      OnRequest = studyRequest
+      Template.AllowTagParams = False
+    end  
+    item
+      Name = 'relax'
+      Default = False
+      OnRequest = relaxRequest
+      Template.AllowTagParams = False
+    end  
+    item
+      Name = 'allbright'
+      Default = False
+      OnRequest = allbrightRequest
+      Template.AllowTagParams = False
+    end  
+    item
+      Name = 'hoff'
+      Default = False
+      OnRequest = hoffRequest
+      Template.AllowTagParams = False
+    end  
+    item
+      Name = 'home'
+      Default = False
+      OnRequest = homeRequest
+      Template.AllowTagParams = False
+    end  
+    item
+      Name = 'bedroom'
+      Default = False
+      OnRequest = bedroomRequest
+      Template.AllowTagParams = False
+    end  
+    item
+      Name = 'blacklight'
+      Default = False
+      OnRequest = blacklightRequest
+      Template.AllowTagParams = False
+    end  
+    item
+      Name = 'entrance'
+      Default = False
+      OnRequest = entranceRequest
+      Template.AllowTagParams = False
+    end>
+  DefActionWhenUnknown = False
+  CreateSession = False
+  Height = 147
+  HorizontalOffset = 300
+  VerticalOffset = 192
+  Width = 147
+  PPI = 94
+end

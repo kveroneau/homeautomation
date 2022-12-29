@@ -1,0 +1,35 @@
+{ This Pascal file is used with Supervisor. }
+procedure LightController;
+begin
+  RunService('LightController', GetPath+'/LightController', '');
+  AlwaysRestart('LightController', True);
+end;
+
+procedure LightApp;
+begin
+  RunService('LightApp', GetPath+'/LightApp', '');
+end;
+
+procedure HTTPEndpoints;
+begin
+  RunService('Endpoints', GetPath+'/HTTPEndpoints', '');
+  AlwaysRestart('Endpoints', True);
+end;
+
+procedure start;
+begin
+  LightController;
+  LightApp;
+  HTTPEndpoints;
+  StartHTTPServer(9001);
+end;
+
+procedure stop;
+begin
+  Exec('/usr/bin/curl', 'http://localhost:8080/CUShutdown');
+end;
+
+procedure ps;
+begin
+  ListServices;
+end;
