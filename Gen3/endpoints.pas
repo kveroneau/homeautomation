@@ -6,7 +6,7 @@ interface
 
 uses
   SysUtils, Classes, httpdefs, fpHTTP, fpWeb, fphttpapp, netcard, cutypes,
-  fpjson, jsonparser;
+  fpjson, jsonparser, cmdparse;
 
 type
 
@@ -136,9 +136,9 @@ var
   info: PBlockInfo;
 begin
   FLightNames:=Nil;
-  FCard:=TNetCard.Create('cherry.home.lan', 3845);
-  FCard.Authenticate('HomeCU');
-  FCard.SelectCard(2);
+  FCard:=TNetCard.Create(CmdParams^.server, CmdParams^.port);
+  FCard.Authenticate(CmdParams^.key);
+  FCard.SelectCard(CmdParams^.card);
   New(info);
   FBlockID:=FCard.FindType(LIGHT_TYPNO, info);
   Dispose(info);

@@ -6,8 +6,8 @@ uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
   {$ENDIF}{$ENDIF}
-  Classes, SysUtils, CustApp, cutypes, phue, fpjson, memcard,
-  netcard
+  Classes, SysUtils, CustApp, phue, fpjson, netcard,
+  cutypes, cmdparse
   { you can add units after this };
 
 type
@@ -209,27 +209,13 @@ end;
 
 procedure TLightController.DoRun;
 var
-  ErrorMsg: String;
   info: PBlockInfo;
 begin
-  // quick check parameters
-  ErrorMsg:=CheckOptions('h', 'help');
-  if ErrorMsg<>'' then begin
-    ShowException(Exception.Create(ErrorMsg));
-    Terminate;
-    Exit;
-  end;
+  InitConfig(Self);
 
-  // parse parameters
-  if HasOption('h', 'help') then begin
-    WriteHelp;
-    Terminate;
-    Exit;
-  end;
-
-  FCard:=TNetCard.Create('cherry.home.lan', 3845);
-  FCard.Authenticate('HomeCU');
-  FCard.SelectCard(2);
+  FCard:=TNetCard.Create(CmdParams^.server, CmdParams^.port);
+  FCard.Authenticate(CmdParams^.key);
+  FCard.SelectCard(CmdParams^.card);
 
   FHue:=THueBridge.Create(Self);
   SetLength(Lights, FHue.LightCount+1);

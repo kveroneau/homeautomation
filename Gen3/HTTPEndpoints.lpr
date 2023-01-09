@@ -3,7 +3,7 @@ program HTTPEndpoints;
 {$mode objfpc}{$H+}
 
 uses
-  fphttpapp, endpoints, netcard;
+  sysutils, fphttpapp, endpoints, netcard, cmdparse;
 
 begin
   Application.Title:='Home Automation Endpoints';
@@ -11,6 +11,11 @@ begin
   Application.LegacyRouting:=True;
   Application.DefaultModuleName:='cu';
   Application.Initialize;
-  Application.Run;
+  try
+    InitConfig(Application);
+    Application.Run;
+  except
+    On Exception do Application.Terminate;
+  end;
 end.
 

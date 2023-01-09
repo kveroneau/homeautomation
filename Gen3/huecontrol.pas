@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, memcard,
-  cutypes, netcard;
+  cutypes, netcard, cmdparse;
 
 type
 
@@ -55,9 +55,12 @@ var
   info: PBlockInfo;
   i: integer;
 begin
-  FCard:=TNetCard.Create('cherry.home.lan', 3845);
-  FCard.Authenticate('HomeCU');
-  FCard.SelectCard(2);
+  InitConfig(Application);
+
+  FCard:=TNetCard.Create(CmdParams^.server, CmdParams^.port);
+  FCard.Authenticate(CmdParams^.key);
+  FCard.SelectCard(CmdParams^.card);
+
   New(info);
   FBlockID:=FCard.FindType(LIGHT_TYPNO, info);
   Dispose(info);

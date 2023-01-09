@@ -1,18 +1,32 @@
 { This Pascal file is used with Supervisor. }
+const
+  CU_PARAMS = '-s localhost -p 3845 -c 0 -k TestKey123';
+
+procedure mcserver;
+begin
+  RunService('MCServer', GetPath+'/mcserver', '');
+  AlwaysRestart('MCServer', True);
+end;
+
 procedure LightController;
 begin
-  RunService('LightController', GetPath+'/LightController', '');
+  RunService('LightController', GetPath+'/LightController', CU_PARAMS);
   AlwaysRestart('LightController', True);
 end;
 
 procedure LightApp;
 begin
-  RunService('LightApp', GetPath+'/LightApp', '');
+  RunService('LightApp', GetPath+'/LightApp', CU_PARAMS);
+end;
+
+procedure CUApp;
+begin
+  RunService('CUApp', GetPath+'/CUApp', CU_PARAMS);
 end;
 
 procedure HTTPEndpoints;
 begin
-  RunService('Endpoints', GetPath+'/HTTPEndpoints', '');
+  RunService('Endpoints', GetPath+'/HTTPEndpoints', CU_PARAMS);
   AlwaysRestart('Endpoints', True);
 end;
 
