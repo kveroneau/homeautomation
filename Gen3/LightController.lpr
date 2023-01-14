@@ -6,8 +6,8 @@ uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
   {$ENDIF}{$ENDIF}
-  Classes, SysUtils, CustApp, phue, fpjson, netcard,
-  cutypes, cmdparse
+  Classes, SysUtils, CustApp, phue, fpjson,
+  netcard, cutypes, cmdparse{$IFDEF UNIX}, signals{$ENDIF}
   { you can add units after this };
 
 type
@@ -31,6 +31,9 @@ type
     procedure FadeLights;
     procedure AppLoop;
     procedure InitBlock(info: PBlockInfo);
+    {$IFDEF UNIX}
+    procedure HandleSignal;
+    {$ENDIF}
   protected
     procedure DoRun; override;
   public
@@ -207,6 +210,16 @@ begin
   FCard.WriteBlock(FBlockID, FBlock, info);
 end;
 
+{$IFDEF UNIX}
+procedure TLightController.HandleSignal;
+begin
+  if Assigned(LightSettings) then
+    LightSettings^.running:=False
+  else
+    Halt(2);
+end;
+{$ENDIF}
+
 procedure TLightController.DoRun;
 var
   info: PBlockInfo;
@@ -241,6 +254,10 @@ begin
   FCard.OnSync:=@ProcessSync;
   FCard.Subscribe(FBlockID);
   FSyncLock:=False;
+
+  {$IFDEF UNIX}
+  OnSignal:=@HandleSignal;
+  {$ENDIF}
 
   AppLoop;
   WriteLn('AppLoop Ended.');

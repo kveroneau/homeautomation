@@ -8,6 +8,7 @@ uses
   {$ENDIF}
   Classes, SysUtils, CustApp, netcard, cutypes, cmdparse, suncalc,
   DateUtils, Math, opensslsockets, ecweather, forecast
+  {$IFDEF UNIX}, signals{$ENDIF}
   { you can add units after this };
 
 type
@@ -29,6 +30,9 @@ type
     procedure Log(msg: string);
     procedure UpdateSun;
     procedure UpdateWeather;
+    {$IFDEF UNIX}
+    procedure HandleSignal;
+    {$ENDIF UNIX}
   protected
     procedure DoRun; override;
   public
@@ -177,6 +181,16 @@ begin
   end;
 end;
 
+{$IFDEF UNIX}
+procedure TAutomation.HandleSignal;
+begin
+  if Assigned(CUSettings) then
+    CUSettings^.running:=False
+  else
+    Halt(2);
+end;
+{$ENDIF}
+
 procedure TAutomation.DoRun;
 var
   info: PBlockInfo;
@@ -205,6 +219,8 @@ begin
 
   FCard.OnSync:=@ProcessSync;
   FSyncLock:=False;
+
+  {$IFDEF UNIX}OnSignal:=@HandleSignal;{$ENDIF}
 
   try
     UpdateSun;
