@@ -1,0 +1,83 @@
+object DayForm: TDayForm
+  Left = 396
+  Height = 235
+  Top = 263
+  Width = 176
+  BorderStyle = bsDialog
+  Caption = 'Select Day...'
+  ClientHeight = 235
+  ClientWidth = 176
+  DesignTimePPI = 94
+  OnCreate = FormCreate
+  LCLVersion = '2.0.12.0'
+  object SunBtn: TButton
+    Left = 8
+    Height = 24
+    Top = 8
+    Width = 153
+    Caption = 'Sunday'
+    ModalResult = 1
+    OnClick = SunBtnClick
+    TabOrder = 0
+  end
+  object MonBtn: TButton
+    Left = 8
+    Height = 24
+    Top = 40
+    Width = 153
+    Caption = 'Monday'
+    ModalResult = 1
+    OnClick = MonBtnClick
+    TabOrder = 1
+  end
+  object TueBtn: TButton
+    Left = 8
+    Height = 24
+    Top = 72
+    Width = 153
+    Caption = 'Tueday'
+    ModalResult = 1
+    OnClick = TueBtnClick
+    TabOrder = 2
+  end
+  object WedBtn: TButton
+    Left = 8
+    Height = 24
+    Top = 104
+    Width = 153
+    Caption = 'Wednesday'
+    ModalResult = 1
+    OnClick = WedBtnClick
+    TabOrder = 3
+  end
+  object ThurDay: TButton
+    Left = 8
+    Height = 24
+    Top = 136
+    Width = 153
+    Caption = 'Thursday'
+    ModalResult = 1
+    OnClick = ThurDayClick
+    TabOrder = 4
+  end
+  object FriBtn: TButton
+    Left = 8
+    Height = 24
+    Top = 168
+    Width = 153
+    Caption = 'Friday'
+    ModalResult = 1
+    OnClick = FriBtnClick
+    TabOrder = 5
+  end
+  object SatBtn: TButton
+    Left = 8
+    Height = 24
+    Top = 200
+    Width = 153
+    Caption = 'Saturday'
+    ModalResult = 1
+    OnClick = SatBtnClick
+    TabOrder = 6
+  end
+end

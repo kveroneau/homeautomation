@@ -1,0 +1,641 @@
+object HomeForm: THomeForm
+  Left = 298
+  Height = 374
+  Top = 185
+  Width = 519
+  Caption = 'Home Manager'
+  ClientHeight = 374
+  ClientWidth = 519
+  DesignTimePPI = 94
+  OnCreate = FormCreate
+  OnResize = FormResize
+  LCLVersion = '2.0.12.0'
+  object TabBar: TPageControl
+    Left = 0
+    Height = 336
+    Top = 0
+    Width = 488
+    ActivePage = HomeCU
+    TabIndex = 0
+    TabOrder = 0
+    object HomeCU: TTabSheet
+      Caption = 'Home Automation'
+      ClientHeight = 310
+      ClientWidth = 486
+      object HomeFlags: TCheckGroup
+        Left = 8
+        Height = 200
+        Top = 8
+        Width = 213
+        AutoFill = True
+        Caption = 'Flags'
+        ChildSizing.LeftRightSpacing = 6
+        ChildSizing.TopBottomSpacing = 6
+        ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+        ChildSizing.EnlargeVertical = crsHomogenousChildResize
+        ChildSizing.ShrinkHorizontal = crsScaleChilds
+        ChildSizing.ShrinkVertical = crsScaleChilds
+        ChildSizing.Layout = cclLeftToRightThenTopToBottom
+        ChildSizing.ControlsPerLine = 1
+        ClientHeight = 181
+        ClientWidth = 211
+        Items.Strings = (
+          'Home Mode'
+          'Sleeping'
+          'Dark'
+          'Wake Me'
+          'Paused'
+          'Rooms'
+        )
+        TabOrder = 0
+        Data = {
+          06000000020202020202
+        }
+      end
+      object IsRunning: TCheckBox
+        Left = 8
+        Height = 21
+        Top = 216
+        Width = 75
+        Caption = 'Running'
+        TabOrder = 1
+      end
+      object LogMsg: TLabeledEdit
+        Left = 232
+        Height = 24
+        Top = 32
+        Width = 240
+        EditLabel.Height = 18
+        EditLabel.Width = 240
+        EditLabel.Caption = 'Log Message:'
+        EditLabel.ParentColor = False
+        EditLabel.ParentFont = False
+        EditLabel.Font.Style = [fsBold]
+        TabOrder = 2
+        Text = 'Log Message'
+        OnKeyPress = LogMsgKeyPress
+      end
+      object SayMsg: TLabeledEdit
+        Left = 232
+        Height = 24
+        Top = 88
+        Width = 240
+        EditLabel.Height = 18
+        EditLabel.Width = 240
+        EditLabel.Caption = 'Say Message:'
+        EditLabel.ParentColor = False
+        EditLabel.ParentFont = False
+        EditLabel.Font.Style = [fsBold]
+        TabOrder = 3
+        Text = 'Say Message'
+        OnKeyPress = SayMsgKeyPress
+      end
+      object Sunrise: TLabeledEdit
+        Left = 232
+        Height = 24
+        Top = 144
+        Width = 78
+        EditLabel.Height = 18
+        EditLabel.Width = 78
+        EditLabel.Caption = 'Sunrise'
+        EditLabel.ParentColor = False
+        TabOrder = 4
+        Text = 'Sunrise'
+      end
+      object Sunset: TLabeledEdit
+        Left = 312
+        Height = 24
+        Top = 144
+        Width = 78
+        EditLabel.Height = 18
+        EditLabel.Width = 78
+        EditLabel.Caption = 'Sunset'
+        EditLabel.ParentColor = False
+        TabOrder = 5
+        Text = 'Sunset'
+      end
+      object VmRSS: TLabeledEdit
+        Left = 394
+        Height = 24
+        Top = 144
+        Width = 78
+        EditLabel.Height = 18
+        EditLabel.Width = 78
+        EditLabel.Caption = 'VmRSS'
+        EditLabel.ParentColor = False
+        TabOrder = 6
+        Text = 'VmRSS'
+      end
+    end
+    object Lights: TTabSheet
+      Caption = 'Light Data'
+      ClientHeight = 310
+      ClientWidth = 486
+      object LightList: TListBox
+        Left = 0
+        Height = 278
+        Top = 8
+        Width = 170
+        ItemHeight = 0
+        OnClick = LightListClick
+        ScrollWidth = 168
+        TabOrder = 0
+        TopIndex = -1
+      end
+      object GroupBox1: TGroupBox
+        Left = 176
+        Height = 142
+        Top = 144
+        Width = 293
+        Caption = 'Light Settings'
+        ClientHeight = 123
+        ClientWidth = 291
+        TabOrder = 1
+        object LightCount: TLabeledEdit
+          Left = 8
+          Height = 30
+          Top = 24
+          Width = 78
+          EditLabel.Height = 18
+          EditLabel.Width = 78
+          EditLabel.Caption = 'Count:'
+          EditLabel.ParentColor = False
+          EditLabel.ParentFont = False
+          EditLabel.Font.Style = [fsBold]
+          TabOrder = 0
+          Text = 'LightCount'
+        end
+        object Label1: TLabel
+          Left = 8
+          Height = 18
+          Top = 64
+          Width = 40
+          Caption = 'Mode:'
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+        end
+        object LightMode: TComboBox
+          Left = 8
+          Height = 30
+          Top = 88
+          Width = 98
+          ItemHeight = 0
+          Items.Strings = (
+            'Adapt'
+            'Enforce'
+          )
+          ParentShowHint = False
+          TabOrder = 1
+          Text = 'LightMode'
+        end
+        object LightsRunning: TCheckBox
+          Left = 187
+          Height = 21
+          Top = 28
+          Width = 75
+          Caption = 'Running'
+          TabOrder = 2
+        end
+        object LgtVmRSS: TLabeledEdit
+          Left = 187
+          Height = 30
+          Top = 88
+          Width = 78
+          EditLabel.Height = 18
+          EditLabel.Width = 78
+          EditLabel.Caption = 'VmRSS:'
+          EditLabel.ParentColor = False
+          EditLabel.ParentFont = False
+          EditLabel.Font.Style = [fsBold]
+          TabOrder = 3
+          Text = 'LgtVmRSS'
+        end
+      end
+      object GroupBox2: TGroupBox
+        Left = 176
+        Height = 128
+        Top = 8
+        Width = 288
+        Caption = 'Light Info'
+        ClientHeight = 109
+        ClientWidth = 286
+        TabOrder = 2
+        object LightLit: TCheckBox
+          Left = 8
+          Height = 21
+          Top = 8
+          Width = 39
+          Caption = 'Lit'
+          TabOrder = 0
+        end
+        object LightBright: TTrackBar
+          Left = 8
+          Height = 42
+          Top = 56
+          Width = 266
+          Max = 255
+          Position = 0
+          TabOrder = 1
+        end
+        object LightHue: TLabeledEdit
+          Left = 64
+          Height = 30
+          Top = 16
+          Width = 78
+          EditLabel.Height = 18
+          EditLabel.Width = 78
+          EditLabel.Caption = 'Hue:'
+          EditLabel.ParentColor = False
+          EditLabel.ParentFont = False
+          EditLabel.Font.Style = [fsBold]
+          TabOrder = 2
+          Text = 'LightHue'
+        end
+        object LightSat: TLabeledEdit
+          Left = 184
+          Height = 30
+          Top = 16
+          Width = 78
+          EditLabel.Height = 18
+          EditLabel.Width = 78
+          EditLabel.Caption = 'Saturation:'
+          EditLabel.ParentColor = False
+          EditLabel.ParentFont = False
+          EditLabel.Font.Style = [fsBold]
+          TabOrder = 3
+          Text = 'LightSat'
+        end
+      end
+    end
+    object Forecast: TTabSheet
+      Caption = 'Weather'
+      ClientHeight = 310
+      ClientWidth = 486
+      object Label2: TLabel
+        Left = 8
+        Height = 18
+        Top = 16
+        Width = 91
+        Caption = 'Temperature:'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object Temperature: TLabel
+        Left = 104
+        Height = 18
+        Top = 16
+        Width = 77
+        Caption = 'Temperature'
+        ParentColor = False
+      end
+      object Label3: TLabel
+        Left = 8
+        Height = 18
+        Top = 40
+        Width = 74
+        Caption = 'Conditions:'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object Conditions: TLabel
+        Left = 104
+        Height = 18
+        Top = 40
+        Width = 65
+        Caption = 'Conditions'
+        ParentColor = False
+      end
+      object Label4: TLabel
+        Left = 8
+        Height = 18
+        Top = 104
+        Width = 34
+        Caption = 'Title:'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object FutureTitle: TLabel
+        Left = 104
+        Height = 18
+        Top = 104
+        Width = 65
+        Caption = 'FutureTitle'
+        ParentColor = False
+      end
+      object Label5: TLabel
+        Left = 8
+        Height = 18
+        Top = 128
+        Width = 91
+        Caption = 'Temperature:'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object FutureTemp: TLabel
+        Left = 104
+        Height = 18
+        Top = 128
+        Width = 73
+        Caption = 'FutureTemp'
+        ParentColor = False
+      end
+      object Label6: TLabel
+        Left = 8
+        Height = 18
+        Top = 152
+        Width = 57
+        Caption = 'Outlook:'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+      end
+      object FutureOutlook: TLabel
+        Left = 104
+        Height = 18
+        Top = 152
+        Width = 89
+        Caption = 'FutureOutlook'
+        ParentColor = False
+      end
+    end
+    object ScheduleEditor: TTabSheet
+      Caption = 'Scheduler'
+      ClientHeight = 310
+      ClientWidth = 486
+      object ToolBar: TToolBar
+        Left = 0
+        Height = 25
+        Top = 0
+        Width = 478
+        Caption = 'ToolBar'
+        Images = ImageList
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 0
+        object NewBtn: TToolButton
+          Left = 1
+          Hint = 'New Schedule'
+          Top = 2
+          Caption = 'New Schedule'
+          ImageIndex = 0
+          OnClick = NewBtnClick
+        end
+        object OpenBtn: TToolButton
+          Left = 24
+          Hint = 'Open Schedule'
+          Top = 2
+          Caption = 'Open Schedule'
+          ImageIndex = 1
+          OnClick = OpenBtnClick
+        end
+        object SaveBtn: TToolButton
+          Left = 47
+          Hint = 'Save Schedule'
+          Top = 2
+          Caption = 'Save Schedule'
+          ImageIndex = 2
+          OnClick = SaveBtnClick
+        end
+        object CurrentBtn: TToolButton
+          Left = 70
+          Hint = 'Current Schedule'
+          Top = 2
+          Caption = 'Current Schedule'
+          ImageIndex = 3
+          OnClick = CurrentBtnClick
+        end
+        object ToolButton1: TToolButton
+          Left = 93
+          Height = 5
+          Top = 2
+          Caption = 'ToolButton1'
+          Style = tbsDivider
+        end
+        object AddRowBtn: TToolButton
+          Left = 98
+          Hint = 'Append a new Row'
+          Top = 2
+          Caption = 'Add New Row'
+          ImageIndex = 4
+          OnClick = AddRowBtnClick
+        end
+      end
+      object ScheduleGrid: TStringGrid
+        Left = 0
+        Height = 192
+        Top = 24
+        Width = 476
+        ColCount = 3
+        Columns = <        
+          item
+            Title.Caption = 'Time'
+          end        
+          item
+            ButtonStyle = cbsPickList
+            PickList.Strings = (
+              'saNotify'
+              'saEndpoint'
+              'saSpecial'
+            )
+            Title.Caption = 'Action'
+            Width = 100
+          end        
+          item
+            Title.Caption = 'Param'
+            Width = 300
+          end>
+        FixedCols = 0
+        MouseWheelOption = mwGrid
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+        ScrollBars = ssAutoVertical
+        TabOrder = 1
+      end
+    end
+  end
+  object StatusBar: TStatusBar
+    Left = 0
+    Height = 20
+    Top = 354
+    Width = 519
+    Panels = <>
+  end
+  object ImageList: TImageList
+    Left = 20
+    Top = 270
+    Bitmap = {
+      4C69050000001000000010000000000000100000003A0000003A0000003A0000
+      003A0000003A0000003A0000003A0000003A0000003A0075008829A829E75BC3
+      5BF92AAA2AE2009F0068FFFFFF000000003AEAEAEAFFE9E9E8FFEBEBEAFFEDED
+      ECFFEEEEEDFFEFEFEEFFF0F0EFFFF1F1F0FF8FCF8FFF36BF36FF78D578FFFFFF
+      FFFF78D57AFF35C035FD009D00670000003AEAE9E8FFE9E9E8FFEBEBEAFFEDED
+      ECFFEEEEEDFFEFEFEEFFF0F0EFFFF1F1F0FF21A621FF1DB61DFF29B43FFFFFFF
+      FFFF29BC5AFF1DBC33FF009B00DC0000003AECECEBFFECECEBFFEDEDECFFEFEF
+      EEFFF0F0EFFFF1F1F1FFF2F2F2FFF3F3F3FF099509FFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFF009300F60000003AEEEEEDFFEDEDEDFFEFEFEEFFF1F1
+      F0FFF2F2F2FFF4F4F3FFF5F5F5FFF6F6F6FF21B421FF00A003FF00A034FFFFFF
+      FFFF00B064FF00AF32FF00A800DC0000003AEFEFEEFFEFEFEEFFF1F1F0FFF3F3
+      F2FFF4F4F4FFF6F6F6FFF7F7F7FFF8F8F8FF95DD95FF02AD02FF00A31AFFFFFF
+      FFFF00B036FF00AD03FD00B200660000003AF1F1F0FFF1F1F0FFF3F3F2FFF5F5
+      F4FFF6F6F6FFF8F8F8FFF9F9F9FFFAFAFAFFFAFAFAFF95DF95FF23C423FF0AAF
+      0AFF00B300E300B80066FFFFFF000000003AF2F2F2FFF2F2F2FFF4F4F4FFF6F6
+      F6FFF8F8F8FFFAFAFAFFFAFAFAFFFBFBFBFFFBFBFBFFFCFCFCFFFCFCFCFFFCFC
+      FCFF0000003AFFFFFF00FFFFFF000000003AF4F4F3FFF4F4F3FFF6F6F6FFF8F8
+      F8FFFAFAFAFFFBFBFBFFFBFBFBFFFCFCFCFFFCFCFCFFFDFDFDFFFDFDFDFFFDFD
+      FDFF0000003AFFFFFF00FFFFFF000000003AF4F4F4FFF5F5F5FFF7F7F7FFFAFA
+      FAFFFAFAFAFFFBFBFBFFFCFCFCFFFDFDFDFFFDFDFDFFFEFEFEFFFEFEFEFFFEFE
+      FEFF0000003AFFFFFF00FFFFFF000000003AF5F5F4FFF6F6F6FFF9F9F9FFFAFA
+      FAFFFBFBFBFFFCFCFCFFFDFDFDFFFEFEFEFFFEFEFEFFFCFCFCFFFAFAFAFFF0EF
+      EFFE00000035FFFFFF00FFFFFF000000003AF6F6F5FFF7F7F7FFFAFAFAFFFBFB
+      FBFFFCFCFCFFFDFDFDFFFEFEFEFFFEFEFEFFE0E0E0FFC6C6C6FFCFCFCEFF8886
+      84C700000005FFFFFF00FFFFFF000000003AF6F6F6FFF8F8F8FFFAFAFAFFFBFB
+      FBFFFCFCFCFFFDFDFDFFFEFEFEFFFBFBFBFFC4C4C4FFFDFDFDFF858580D50000
+      000AFFFFFF00FFFFFF00FFFFFF000000003AF7F7F6FFF8F8F8FFFAFAFAFFFBFB
+      FBFFFCFCFCFFFDFDFDFFFEFEFEFFF4F4F4FFCCCCCCFF83837ED500000012FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF0000000039F7F7F6FEF9F9F9FFFBFBFBFFFBFB
+      FBFFFCFCFCFFFDFDFDFFFFFFFFFFEAE9E9FE81817EC70000000AFFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF0000000007000000390000003A0000003A0000
+      003A0000003A0000003A0000003A0000003500000005FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF000000000000000003000000490000004B0000
+      004B0000004B0000004B0000004B0000003D0909090800000000000000000000
+      0000000000000000000000000000B57F54C9764C28FFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFE7E7E8FF292A2A9600000000000000000000
+      00000000000000000000B57F5400A7734AFF9B7251FFFFFFFFFFF6F6F6FFF8F8
+      F8FFF8F8F9FFF4F4F5FFEBEBEBFFC4C4C4FEFEFFFFFF6A513BFFB87E51FFBC83
+      54FFBB8154FFC28758D50000000092643DFF906A4AFFFFFFFFFFF8F8F8FFF8F8
+      F8FFF9F9F9FFF6F6F6FFEEEEEFFFA0A0A0FFFFFFFFFFDEE1E4FF77614EFFD7A2
+      78FFE1A97CFFAD7649FF000000007A522FFF875E3EFFFFFFFFFFF7F7F8FFF9F9
+      F9FFF9F9F9FFF7F7F7FFF2F2F2FF9A9A9AFFFFFFFFFFEFEFF1FFDBDDE1FF6D4F
+      37FFCD9468FF7B5230FF00000000714B2BFF7A522FFFFFFFFFFFF7F7F8FFF9F9
+      F9FFF9F9F9FFF8F8F8FFF5F5F5FFA0A0A1FFFFFFFFFFFFFFFFFFFFFFFFFFFAFC
+      FFFF795D46FF734B2AFF000000006A4625FF6D4321FFFFFFFFFFF7F7F7FFF8F8
+      F8FFF9F9FAFFFAFBFBFFF9F9FAFFEBEBEBFFB8B8B8FFB3B3B4FFACACADFFB0B0
+      B2FFF0F2F4FF4A2A0EFF00000000644122FF5E3411FFFFFFFFFFF8F8F8FFFAFA
+      FBFFFAF9FAFFE5E1DFFFD8D3CFFFD6D2CEFFD5CFCCFFD1CDC9FFCEC8C6FFCAC4
+      C1FFE5E2E0FF311400FF000000005B3918FF451E00FFEAE8E8FFD5D1CEFFD6D2
+      D0FFC3BBB5FFBEA287FFEBCDA7FFEACDA8FFEBCDA9FFEBCDA8FFEBCDA8FFEBCD
+      A8FFEBCEAAFFFCE0BCFFCBB193BA9F764FFFFBE0BCFFEACCA7FFE9CBA6FFEACC
+      A6FFEBCEA8FFEACEAAFFDAAB85FFD7A682FFD7A680FFD7A67FFFD7A682FFD7A6
+      80FFD7A680FFE1AD87FF785D48FFA97950FFDCA983FFD6A37CFFD6A37DFFD6A3
+      7DFFD6A37EFFD6A37EFFD8A681FFD8A780FFD8A780FFD8A780FFD8A782FFD8A7
+      81FFD8A781FFE1AE87FF7B5F49FFAA7A51FFE0AE8AFFDBA983FFDBA983FFDBA9
+      86FFDBA983FFDBA987FFDBA985FFDBA984FFDBA983FFDBA986FFDBA983FFDBA9
+      86FFDAA984FFE4B189FF7C5F4AFF9B6739FFB47640FFB0743FFFB0743FFFB074
+      3FFFB0743FFFB07440FFB0743FFFB07440FFB0743FFFB0743FFFB0743FFFB074
+      3FFFB0743FFFB97A43FF664427FFAD7F58FFDFAD87FFDAA984FFDAA985FFDAA9
+      86FFDAA985FFDAA984FFDAA984FFDAA985FFDAA986FFDAA985FFDAA983FFDAA9
+      85FFDAA984FFE3B08AFF816450FFA6754AB9DDA881FFD8A37DFFD8A47EFFD8A3
+      7CFFD9A378FFD9A37CFFD9A47EFFD9A47EFFD9A37EFFD9A379FFD8A37AFFD8A4
+      7EFFD8A37EFFE0A981FF805F45AF381800413313007A3314007B3213007C3213
+      007D3113007E3113007F30120081301200813112007F3113007E3213007D3213
+      007C3314007B3313007A3D1B0042FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF004B4B4CEF444344FFB9B4B3FFB9B4
+      B3FFB9B4B3FFB9B4B3FFB9B6B4FFBBB6B4FFBCB8B6FFBCB9B7FFBCB9B8FFBCB9
+      B9FF444344FF4B4B4CEFFFFFFF00FFFFFF00414042FF59595AFFFAF4F1FFFAF4
+      F0FFFAF4F0FFFAF4F0FFFAF4F1FFFAF5F2FFFBF6F3FFFCF8F5FFFCF9F7FFFDFB
+      F9FF646365FF414042FFFFFFFF00FFFFFF003F3E40FF616062FFFDFAF9FFCFB6
+      9CFFCFB69CFFCFB69CFFCFB69CFFCFB69DFFCFB79DFFD0B79EFFD0B89FFFFEFD
+      FDFF616062FF3F3E40FFFFFFFF00FFFFFF003D3C3DFF5D5C5EFFFDFCFBFFFBF9
+      F8FFFBF9F9FFFBF9F8FFFBF9F8FFFAF8F7FFFAF7F5FFF9F6F4FFF8F4F2FFF9F6
+      F2FF5D5C5EFF3D3C3DFFFFFFFF00FFFFFF003B3A3BFF5A595BFFF7F3EEFFF7F3
+      EFFFF7F3EFFFF7F3EFFFF7F3EEFFF6F2EEFFF6F1EDFFF5F0EBFFF4EFE9FFF3ED
+      E7FF5A595BFF3B3A3BFFFFFFFF00FFFFFF00383739FF565557FFF1EAE2FFB8A2
+      8BFFB8A28BFFB8A28BFFB8A28BFFB7A18AFFB7A18AFFB7A08AFFB6A089FFEDE5
+      DCFF565557FF383739FFFFFFFF00FFFFFF00363537FF535254FFE8DED4FFE8DD
+      D0FFE8DDD0FFE8DDD0FFE7DCD0FFE7DCCFFFE7DBCFFFE6DBCEFFE6DACDFFE6DA
+      CFFF535254FF363537FFFFFFFF00FFFFFF00333335FF4F4E51FF4F4E51FF4F4E
+      51FF4F4E51FF4F4E51FF4F4E51FF4F4E51FF4F4E51FF4F4E51FF4F4E51FF4F4E
+      51FF4F4E51FF333335FFFFFFFF00FFFFFF00313032FF4B4A4DFF4B4A4DFF4B4A
+      4DFF4B4A4DFF4B4A4DFF4B4A4DFF4B4A4DFF4B4A4DFF4B4A4DFF4B4A4DFF4B4A
+      4DFF4B4A4DFF313032FFFFFFFF00FFFFFF002E2D30FF464549FF464549FFCDCD
+      CDFFD6D6D6FFD5D5D6FFD5D5D5FFD6D6D6FFD6D6D6FFD3D3D3FF272629FF2423
+      26FF464549FF2E2D30FFFFFFFF00FFFFFF002A292BFF403F42FF403F42FFA7A7
+      A7FF3D3C3FFF333335FFAEAEAEFFAEAEAEFFAEAEAEFFAEAEAEFF414042FF2727
+      28FF444346FF2A292BFFFFFFFF00FFFFFF00252426FF39383BFF39383BFF9999
+      99FF323134FF262528FF9F9F9FFF9F9F9FFF9F9F9FFF9F9F9FFF3F3E41FF2524
+      26FF58575AFF252426FFFFFFFF00FFFFFF00222224ED2A2A2DFF323135FF8B8A
+      8BFF29282BFF201F21FF909090FF909090FF909090FF909090FF343336FF201F
+      21FF4E4D51FF212023FFFFFFFF00FFFFFF001F1F252F1D1D1FEC1C1B1EFF7575
+      75FF787878FF787878FF787878FF787878FF787878FF787878FF1A191BFF1919
+      1BFF1D1C1FFF1F1F21EFFFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00A7A7A7199E9E9EFF9E9E9EFFA0A0
+      A0F700000002000000020000000200000002000000029E9E9EFF9E9E9EFF9E9E
+      9EFF00000002FFFFFF00FFFFFF000039006E144A14C2EEEEEEFFEEEEEEFFE3E6
+      E3FB003C00BF003C00BF003C00BF003C00BF003C00BFEEEEEEFFEEEEEEFFEEEE
+      EEFF003B00BE003D0068FFFFFF00003B00BE4BB152FF8BAC8BFF8BAC8BFF8EB0
+      8FFF73D486FF83E099FF8EE7A8FF8EE8A8FF84E09AFF8BAC8BFF8BAC8BFF8BAC
+      8BFF50BB57FF094509B9FFFFFF00003B00BE249D28FF008C01FF089510FF12A1
+      23FF1DAD37FF29BB4EFF35C864FF35C864FF29BB4EFF1DAD37FF12A123FF0895
+      10FF2DA733FF0D490DBAFFFFFF00003C00BF239B26FF008B00FF06930CFF109E
+      1EFF19A82FFF22B341FF29BB4EFF2EBD52FFA4E0B1FF81CF8DFFA1D9A7FF59B7
+      5DFF2CA631FF0D4B0DBCFFFFFF00003C00BF1F9722FF028802FF069009FF0D99
+      16FF16A225FF1BA831FF1EAC38FF1EAC38FF1BA831FF16A225FF0D9916FF0690
+      09FF2AA32FFF0D4A0DBCFFFFFF0000050043FCFCFCFEFCFCFCFFFCFCFCFFFCFC
+      FCFFFCFCFCFFFCFCFCFFFCFCFCFFFCFCFCFFFCFCFCFFFCFCFCFFFCFCFCFFFCFC
+      FCFFFDFDFDFF1C211C49FFFFFF000000003FFBFBFBFEFBFBFBFFFBFBFBFFDFDF
+      DFFFFAFAFAFFDFDFDFFFFAFAFAFFDFDFDFFFFAF8F9FFFFC1E0FFFBFBFBFFFBFB
+      FBFFFCFCFCFF1E1E1E45FFFFFF000000003FFAFAFAFEFAFAFAFFFAFAFAFFFAFA
+      FAFFFAFAFAFFFAFAFAFFFAFAFAFFFAFAFAFFFAFAFAFFFAFAFAFFFAFAFAFFFAFA
+      FAFFFBFBFBFF1E1E1E45FFFFFF000000003FF9F9F9FEF9F9F9FFF9F9F9FFDFDF
+      DFFFF8F8F8FF0D0DDBFF0707DCFF0606DBFFF8F6F7FFFFC1E0FFF9F9F9FFF9F9
+      F9FFFAFAFAFF1E1E1E45FFFFFF000000003FF9F9F9FEF8F8F8FFF8F8F8FFF8F8
+      F8FFF8F8F8FF070791FFE0E0F1FF00008EFFF8F8F8FFF8F8F8FFF8F8F8FFF8F8
+      F8FFF9F9F9FF1E1E1E45FFFFFF000000003FF8F8F8FEF7F7F7FFF7F7F7FFDFDF
+      DFFFF6F6F6FF0606D5FF0606D6FF0000D5FFF6F4F5FFFFC1E0FFF7F7F7FFF7F7
+      F7FFF8F8F8FF1E1E1E44FFFFFF000000003FF7F7F7FEF6F6F6FFF6F6F6FFF6F6
+      F6FFF6F6F6FFEFEFF5FFEEEEF5FFEEEEF5FFF6F6F6FFF6F6F6FFE5E5E5FFCCCC
+      CCFFDCDCDCFE13131342FFFFFF000000003EF6F6F6FEF5F5F5FFF5F5F5FFDEDE
+      DEFFF4F4F4FFDEDEDEFFF4F4F4FFDEDEDEFFF4F4F4FFF5F5F5FFCBCBCBFFFCFC
+      FCFFA8A8A8CD00000009FFFFFF000000003EF7F7F7FDF6F6F6FFF6F6F6FFF6F6
+      F6FFF6F6F6FFF6F6F6FFF6F6F6FFF6F6F6FFF6F6F6FFF6F6F6FFDADADAFEA6A6
+      A6CF0000000CFFFFFF00FFFFFF0000000020191919471C1C1C481C1C1C491C1C
+      1C491C1C1C491C1C1C491C1C1C491C1C1C491C1C1C491C1C1C48161616450000
+      000FFFFFFF00FFFFFF00FFFFFF00000000000000000000000000000000000000
+      000000000000000000000000000000000000000000000193015A42B542D65FC4
+      5FFB42B542D60194015A00000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000097005A43C443FE7ADB8AFFFFFF
+      FFFF7ADB8AFF43C443FE0093005A000000000000000000000000000000000000
+      00000000000000000000000000000000000000A100D62BBC3DFF24B859FFFFFF
+      FFFF24B859FF2BBC3DFF009E00D6000000000000000000000000000000000000
+      000000000000000000000000000000000000009400FCFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFF009500FB8C8C8CFF8D8D8DFF8D8D8DFF8D8D8DFF8D8D
+      8DFF8D8D8DFF8D8D8DFF8D8D8DFF8F8C8FFF12A612FF00A00EFF00992BFFFFFF
+      FFFF00992BFF00A00FFF00AA00D7B0B0B0FFFFFEFEFFFEFDFDFFFFFEFEFFAEAE
+      AEFFFFFEFEFFFEFDFDFFFFFEFEFFB0AEB0FFA5E5A4FF00B000FF00A112FFFFFF
+      FFFF00A113FF00B000FF19BE1864ABAAAAFFFAFAFBFFF9F8F9FFFAF9FAFFA7A7
+      A8FFFAF9FAFFF9F8F9FFFAF9FAFFA7A7A8FFFEFAFDFF9CE69DF418BD19F600AA
+      00FF20B30CFF9AE99CE2F9F7F716F9B789FFFAB98CFFFABD8FFFFBC197FFFCC5
+      9DFFFCC9A3FFFCCAA6FFFDCEABFFFDCFACFFFECFADFFFFCEADEAFFCEAEC0FFFB
+      FBE9FBA46BFFFFFEFFD7FCCFAE16F7AA73FFF4F5F5FFF4F4F2FFF5F5F4FF9A9B
+      9AFFF5F4F3FFF4F3F2FFF5F4F3FF9A9A9AFFF5F4F3FFF7F8F8F3FCFEFFEEFEFF
+      FFEAF59855FFFEFFFFDAFFFEFEC1F59C5DFFF2F3F3FFF2F2F1FFF3F3F3FF9496
+      96FFF3F3F3FFF2F2F1FFF3F3F3FF949696FFF3F2F2FFFBFCFEFBF6AF7EFBFAD9
+      C1F1F48E45FFFAD7BEE7F7AF7CF0F48E47FFF3893DFFF3883BFFF5893CFFF589
+      3CFFF5893CFFF3883CFFF5893DFFF58A3DFFF5893CFFF7B385F4FAD7BEF6F386
+      38FEF38334FFF38638FDFBDFCBDCF28131FFEFECE8FFF8D89AFFF3E6CFFF8889
+      8AFFF8CA8DFFEFE2D5FFF6B873FF888179FFF1BB89FFF0B686EAF7F6F6E2F8C7
+      A4F2F07620FFF8C49FF2FCEDE393F0731BFFF9DFA6FFEDE6E0FFFAD190FF867B
+      69FFF2D9BAFFF4C083FFF0DFCFFF856E57FFF0E1D4FFEEB281EAEEAE7DC1F9F9
+      FBD8F9D7C0E9FDFDFEB2EFEAE719EF680AFFF0E3C8FFF6D9A1FFEBE7E2FF7F76
+      69FFEFDEC8FFEED5B7FFF4BF83FF7C7C7DFFF2A660FFEADDD3EAECB083C0EDBE
+      9B9BF5F5F69DECDED649E9E4E116EF6809FFF56906FFF56805FFF66805FFF669
+      07FFF66C0BFFF66E10FFF77216FFF7771DFFF87B22FFF77D28EAF8822DC0F884
+      3395F988396BF98C3F40F48E4616000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000
+    }
+  end
+  object Timer: TTimer
+    Enabled = False
+    Interval = 500
+    OnTimer = TimerTimer
+    Left = 89
+    Top = 270
+  end
+end
