@@ -6,18 +6,23 @@ unit cuclient;
 interface
 
 uses
-  Classes, SysUtils, cutypes, netcard;
+  Classes, SysUtils, cutypes, netcard, forecast;
 
 type
+
+  EMissingData = class(Exception);
 
   TSayEvent = procedure(const message: String) of Object;
   TLogEvent = procedure(const message: String) of Object;
 
   { THomeCU }
 
-  THomeCU = class(TThread)
+  THomeCU = class(TComponent)
   public
-    constructor Create;
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Connect;
+    procedure CheckEvents;
     procedure Strips;
     procedure AllOff;
     procedure LivingRoom;
@@ -42,6 +47,8 @@ type
     FOnLog: TLogEvent;
     FOnSay: TSayEvent;
     FLastLog, FLastSay: string;
+    FLoadAll: Boolean;
+    FWeather: PWeatherData;
     procedure ProcessSync(card, blkid: integer);
     procedure WriteState;
     procedure DoSync;
@@ -63,8 +70,7 @@ type
     procedure LoadLightData;
     procedure WriteLightData;
     procedure ToggleLight(const lgt: integer);
-  protected
-    procedure Execute; override;
+    procedure LoadForecastData;
   public
     property OnSync: TNotifyEvent read FOnSync write FOnSync;
     property OnLog: TLogEvent read FOnLog write FOnLog;
@@ -78,6 +84,9 @@ type
     property Rooms: Boolean read GetRooms write SetRooms;
     property Sunrise: TDateTime read GetSunrise;
     property Sunset: TDateTime read GetSunset;
+    property LoadAll: Boolean write FLoadAll;
+    property Weather: PWeatherData read FWeather;
+    property Card: TNetCard read FCard;
   end;
 
 implementation
@@ -89,13 +98,73 @@ const
 
 { THomeCU }
 
-constructor THomeCU.Create;
+constructor THomeCU.Create(AOwner: TComponent);
 begin
-  inherited Create(True);
-  FreeOnTerminate:=True;
+  inherited Create(AOwner);
   FCard:=Nil;
   FBlock:=Nil;
   FOnSync:=Nil;
+  FLoadAll:=False;
+  FWeather:=Nil;
+end;
+
+destructor THomeCU.Destroy;
+begin
+  if Assigned(FBlock) then
+    FBlock.Free;
+  if Assigned(FCard) then
+    FCard.Free;
+  if CUSettings <> Nil then
+    Dispose(CUSettings);
+  if LightSettings <> Nil then
+  begin
+    Dispose(LightSettings);
+    SetLength(Lights, 0);
+  end;
+  if FWeather <> Nil then
+    Dispose(FWeather);
+  inherited Destroy;
+end;
+
+procedure THomeCU.Connect;
+var
+  info: PBlockInfo;
+begin
+  FCard:=TNetCard.Create(MC_SERVER, MC_PORT);
+  FCard.Authenticate(MC_KEY);
+  FCard.SelectCard(0);
+
+  New(info);
+  FLightBlk:=FCard.FindType(LIGHT_TYPNO, info);
+  FCUBlk:=FCard.FindType(CU_TYPNO, info);
+  Dispose(info);
+  if (FLightBlk = 0) or (FCUBlk = 0) then
+    raise EMissingData.Create('Control Unit blocks missing from memory card.');
+
+  FBlock:=FCard.ReadBlock(FCUBlk);
+  New(CUSettings);
+  FBlock.Read(CUSettings^, SizeOf(CUSettings^));
+  FLastLog:=CUSettings^.log;
+  FLastSay:=CUSettings^.say;
+  FCard.OnSync:=@ProcessSync;
+  FCard.Subscribe(FCUBlk);
+
+  if FLoadAll then
+  begin
+    LoadLightData;
+    LoadForecastData;
+  end;
+
+  DoSync;
+
+  FRunning:=True;
+end;
+
+procedure THomeCU.CheckEvents;
+var
+  done: Boolean;
+begin
+  FCard.CheckEvents(Self, done);
 end;
 
 procedure THomeCU.Strips;
@@ -246,14 +315,14 @@ begin
   if CUSettings^.log <> FLastLog then
   begin
     FLastLog:=CUSettings^.log;
-    Synchronize(@DoLog);
+    DoLog;
   end;
   if CUSettings^.say <> FLastSay then
   begin
     FLastSay:=CUSettings^.say;
-    Synchronize(@DoSay);
+    DoSay;
   end;
-  Synchronize(@DoSync);
+  DoSync;
 end;
 
 procedure THomeCU.WriteState;
@@ -437,51 +506,21 @@ begin
   WriteLightData;
 end;
 
-procedure THomeCU.Execute;
+procedure THomeCU.LoadForecastData;
 var
-  info: PBlockInfo;
-  done: Boolean;
+  blk: TMemoryStream;
+  blkid: integer;
+  info: TBlockInfo;
 begin
-  FCard:=TNetCard.Create(MC_SERVER, MC_PORT);
-  FCard.Authenticate(MC_KEY);
-  FCard.SelectCard(0);
-
-  New(info);
-  FLightBlk:=FCard.FindType(LIGHT_TYPNO, info);
-  FCUBlk:=FCard.FindType(CU_TYPNO, info);
-  Dispose(info);
-  if (FLightBlk = 0) or (FCUBlk = 0) then
-  begin
-    FCard.Free;
-    Exit;
+  if FWeather = Nil then
+    New(FWeather);
+  blkid:=FCard.FindType(WEATHER_TYPNO, @info);
+  blk:=FCard.ReadBlock(blkid);
+  try
+    blk.Read(FWeather^, SizeOf(FWeather^));
+  finally
+    blk.Free;
   end;
-
-  FBlock:=FCard.ReadBlock(FCUBlk);
-  New(CUSettings);
-  FBlock.Read(CUSettings^, SizeOf(CUSettings^));
-  FLastLog:=CUSettings^.log;
-  FLastSay:=CUSettings^.say;
-  FCard.OnSync:=@ProcessSync;
-  FCard.Subscribe(FCUBlk);
-
-  Synchronize(@DoSync);
-
-  FRunning:=True;
-  repeat
-    Sleep(500);
-    FCard.CheckEvents(Self, done);
-  until not FRunning;
-
-  if Assigned(FBlock) then
-    FBlock.Free;
-  FCard.Free;
-  Dispose(CUSettings);
-  if LightSettings <> Nil then
-  begin
-    Dispose(LightSettings);
-    SetLength(Lights, 0);
-  end;
-
 end;
 
 end.

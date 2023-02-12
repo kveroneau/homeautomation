@@ -7,7 +7,8 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Classes, SysUtils, CustApp, phue, fpjson,
-  netcard, cutypes, cmdparse{$IFDEF UNIX}, signals{$ENDIF}
+  netcard, cutypes, cmdparse{$IFDEF UNIX}, signals{$ENDIF}, logger,
+  kutils
   { you can add units after this };
 
 type
@@ -49,7 +50,7 @@ var
   lgt: TJSONObject;
   i: Integer;
 begin
-  {$IFDEF DEBUG}WriteLn('Adapting State...');{$ENDIF}
+  {$IFDEF DEBUG}LogInfo('Adapting State...');{$ENDIF}
   SetLength(Lights, FHue.LightCount+1);
   for i:=1 to FHue.LightCount do
     with Lights[i] do
@@ -77,7 +78,7 @@ var
   lgt: TJSONObject;
   i: Integer;
 begin
-  {$IFDEF DEBUG}WriteLn('Enforcing State...');{$ENDIF}
+  {$IFDEF DEBUG}LogInfo('Enforcing State...');{$ENDIF}
   for i:=1 to FHue.LightCount do
     with Lights[i] do
     begin
@@ -100,6 +101,8 @@ end;
 
 procedure TLightController.WriteState;
 begin
+  {$IFDEF DEBUG}LogInfo('Writing state...');{$ENDIF}
+  LightSettings^.vmrss:=VmRSS;
   FBlock.Position:=0;
   FBlock.Write(LightSettings^, SizeOf(LightSettings^));
   FBlock.Write(LightNames[0], 21*(FHue.LightCount+1));
@@ -109,7 +112,7 @@ end;
 
 procedure TLightController.ReadState;
 begin
-  {$IFDEF DEBUG}WriteLn('Reading state...');{$ENDIF}
+  {$IFDEF DEBUG}LogInfo('Reading state...');{$ENDIF}
   if Assigned(FBlock) then
     FBlock.Free;
   FBlock:=FCard.ReadBlock(FBlockID);
@@ -133,7 +136,7 @@ end;
 
 procedure TLightController.ProcessSync(card, blkid: integer);
 begin
-  {$IFDEF DEBUG}WriteLn('ProcessSync...');{$ENDIF}
+  {$IFDEF DEBUG}LogInfo('ProcessSync...');{$ENDIF}
   if FSyncLock then
   begin
     FSyncLock:=False;
@@ -180,7 +183,7 @@ begin
       c:=1;
     if c mod 60 = 0 then
     begin
-      {$IFDEF DEBUG}WriteLn(' Checking State...');{$ENDIF}
+      {$IFDEF DEBUG}LogInfo(' Checking State...');{$ENDIF}
       { TODO : Debating on adding sunrise/sunset checking here }
       FHue.Refresh;
       case LightSettings^.mode of
@@ -193,6 +196,7 @@ end;
 
 procedure TLightController.InitBlock(info: PBlockInfo);
 begin
+  LogInfo('Creating new block on Memory Card Server...');
   FBlockID:=FCard.FindFree;
   FBlock:=FCard.ReadBlock(FBlockID);
   info^.title:='Lights Data';
@@ -203,6 +207,7 @@ begin
   LightSettings^.count:=FHue.LightCount;
   LightSettings^.mode:=lmEnforce;
   LightSettings^.running:=True;
+  LightSettings^.vmrss:=VmRSS;
   FBlock.Write(LightSettings^, SizeOf(LightSettings^));
   AdaptState;
   FBlock.Write(LightNames[0], 21*(FHue.LightCount+1));
@@ -224,12 +229,16 @@ procedure TLightController.DoRun;
 var
   info: PBlockInfo;
 begin
+  SetupLog('LightController.log');
+  LogInfo('Light Controller starting...');
   InitConfig(Self);
 
+  LogInfo('Connecting to Memory Card Server...');
   FCard:=TNetCard.Create(CmdParams^.server, CmdParams^.port);
   FCard.Authenticate(CmdParams^.key);
   FCard.SelectCard(CmdParams^.card);
 
+  LogInfo('Connecting to the Philips Hue Bridge...');
   FHue:=THueBridge.Create(Self);
   SetLength(Lights, FHue.LightCount+1);
   SetLength(LightNames, FHue.LightCount+1);
@@ -238,6 +247,7 @@ begin
   New(LightSettings);
 
   New(info);
+  LogInfo('Searching Memory Card Server for LightSettings...');
   FBlockID:=FCard.FindType(LIGHT_TYPNO, info);
   if FBlockID = 0 then
     InitBlock(info)
@@ -251,6 +261,7 @@ begin
     WriteState;
   end;
 
+  LogInfo('Subscribing to LightSettings...');
   FCard.OnSync:=@ProcessSync;
   FCard.Subscribe(FBlockID);
   FSyncLock:=False;
@@ -260,7 +271,7 @@ begin
   {$ENDIF}
 
   AppLoop;
-  WriteLn('AppLoop Ended.');
+  LogInfo('AppLoop Ended.');
   FBlock.Free;
   FCard.Free;
   SetLength(Lights, 0);

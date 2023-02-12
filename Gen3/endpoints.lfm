@@ -68,6 +68,24 @@ object CUEndpoints: TCUEndpoints
       Default = False
       OnRequest = entranceRequest
       Template.AllowTagParams = False
+    end  
+    item
+      Name = 'log'
+      Default = False
+      OnRequest = logRequest
+      Template.AllowTagParams = False
+    end  
+    item
+      Name = 'say'
+      Default = False
+      OnRequest = sayRequest
+      Template.AllowTagParams = False
+    end  
+    item
+      Name = 'living'
+      Default = False
+      OnRequest = livingRequest
+      Template.AllowTagParams = False
     end>
   DefActionWhenUnknown = False
   CreateSession = False

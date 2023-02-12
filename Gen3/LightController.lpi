@@ -93,7 +93,7 @@
         <PackageName Value="klib"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="3">
+    <Units Count="4">
       <Unit0>
         <Filename Value="LightController.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -106,6 +106,10 @@
         <Filename Value="signals.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit2>
+      <Unit3>
+        <Filename Value="logger.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit3>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
